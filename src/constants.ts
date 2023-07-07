@@ -1,0 +1,3 @@
+export const FEE_COLLECTOR = "0x3AC05161b76a35c1c28dC99Aa01BEd7B24cEA3bf";
+export const GELATO_RELAY = "0xaBcC9b596420A9E9172FD5938620E265a0f9Df92";
+export const NATIVE_TOKEN = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
