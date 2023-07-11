@@ -1,7 +1,7 @@
 import { setBalance } from "@nomicfoundation/hardhat-network-helpers";
-import { CallWithSyncFeeRequest } from "@gelatonetwork/relay-sdk";
+import { CallWithERC2771Request, CallWithSyncFeeRequest } from "@gelatonetwork/relay-sdk";
 import { ethers } from "hardhat";
-
+import * as constants from "../constants"
 import { FEE_COLLECTOR, GELATO_RELAY, NATIVE_TOKEN } from "../constants";
 
 /**
@@ -33,4 +33,24 @@ export const callWithSyncFee = async (request: CallWithSyncFeeRequest) => {
     throw new Error("Insufficient relay fee");
 
   return tx;
+};
+
+export const sponsoredCallERC2771Local = async (
+  request: CallWithERC2771Request,
+  /* eslint-disable */
+  provider: any,
+  sponsorApiKey: string
+) => {
+  const gelato = await ethers.getImpersonatedSigner(
+    constants.GELATO_RELAY_1BALANCE_ERC2771
+  );
+
+  await setBalance(gelato.address, ethers.utils.parseEther("1"));
+
+  const data = ethers.utils.solidityPack(
+    ["bytes", "address"],
+    [request.data, request.user]
+  );
+
+  return gelato.sendTransaction({ to: request.target, data });
 };

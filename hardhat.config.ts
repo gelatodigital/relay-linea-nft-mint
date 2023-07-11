@@ -3,6 +3,7 @@ import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomiclabs/hardhat-ethers";
 import "@typechain/hardhat";
 import "hardhat-deploy";
+import "@nomiclabs/hardhat-etherscan";
 
 import * as dotenv from "dotenv";
 dotenv.config({ path: __dirname + "/.env" });
@@ -15,6 +16,7 @@ import assert from "assert";
 assert.ok(RPC_PROVIDER, "Missing RPC_PROVIDER in .env");
 
 const config: HardhatUserConfig = {
+  defaultNetwork:"hardhat",
   solidity: {
     compilers: [
       {
@@ -52,11 +54,24 @@ const config: HardhatUserConfig = {
       accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
     },
   },
-  verify: {
     etherscan: {
-      apiKey: ETHERSCAN_KEY,
-    },
+      apiKey: { 
+        linea: ETHERSCAN_KEY as string
+        },
+      customChains: [
+        {
+          network: "linea",
+          chainId: 59140,
+          urls: {
+            apiURL: "https://goerli.lineascan.build/api",
+            browserURL: "https://goerli.lineascan.build/"
+          }
+        }
+      ]
+
+    
   },
+  
 };
 
 export default config;

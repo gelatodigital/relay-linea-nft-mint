@@ -1,10 +1,10 @@
 import { setBalance } from "@nomicfoundation/hardhat-network-helpers";
-import { CallWithSyncFeeRequest } from "@gelatonetwork/relay-sdk";
+import {  CallWithERC2771Request } from "@gelatonetwork/relay-sdk";
 import { deployments, ethers } from "hardhat";
-import { GaslessNFT } from "../typechain";
-import { NATIVE_TOKEN } from "../src/constants";
-import { callWithSyncFee } from "../src/__mock__/relay-sdk";
+
+import {  sponsoredCallERC2771Local } from "../src/__mock__/relay-sdk";
 import { expect } from "chai";
+import { GaslessNFT } from "../typechain";
 
 describe("GaslessNFT", () => {
   let nft: GaslessNFT;
@@ -12,26 +12,28 @@ describe("GaslessNFT", () => {
   before(async () => {
     await deployments.fixture();
 
+    console.log(15)
+
     const { address } = await deployments.get("GaslessNFT");
+    console.log(address)
     nft = (await ethers.getContractAt("GaslessNFT", address)) as GaslessNFT;
-    setBalance(address, ethers.utils.parseEther("1"));
+     setBalance(address, ethers.utils.parseEther("1"));
   });
 
-  it("mint", async () => {
+  it.only("mint", async () => {
     const [deployer] = await ethers.getSigners();
     const chainId = await deployer.getChainId();
 
-    const { data } = await nft.populateTransaction.mint(deployer.address);
+    const { data } = await nft.populateTransaction.mint();
     if (!data) throw new Error("Invalid transaction");
 
-    const request: CallWithSyncFeeRequest = {
+    const request:  CallWithERC2771Request= {
       target: nft.address,
       data: data,
-      feeToken: NATIVE_TOKEN,
       chainId: chainId,
-      isRelayContext: true,
+      user:deployer.address
     };
 
-    await expect(callWithSyncFee(request)).to.emit(nft, "Transfer");
+    await expect(sponsoredCallERC2771Local(request,"","")).to.emit(nft, "Transfer");
   });
 });
