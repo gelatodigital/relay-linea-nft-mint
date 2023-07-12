@@ -1,24 +1,17 @@
 import { deployments, ethers } from "hardhat";
 import { GaslessNFT } from "../typechain";
-import { NATIVE_TOKEN } from "../src/constants";
-import {
-  CallWithERC2771Request,
-  CallWithSyncFeeRequest,
-  GelatoRelay,
-} from "@gelatonetwork/relay-sdk";
+import { CallWithERC2771Request, GelatoRelay } from "@gelatonetwork/relay-sdk";
 
 const main = async () => {
-  const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY || "";
-  const sponsorKey = process.env.SPONSOR_KEY || "";
-  
-  if (!PRIVATE_KEY)
-    throw "⛔️ Private key not detected! Add it to the .env file!";
+  const PRIVATE_KEY = process.env.PRIVATE_KEY;
+  const SPONSOR_KEY = process.env.SPONSOR_KEY;
 
-  // Initialize the wallet.
-  const wallet = new ethers.Wallet(PRIVATE_KEY);
-  const [deployer] = await ethers.getSigners();
+  if (!PRIVATE_KEY) throw new Error("PRIVATE_KEY missing in .env");
 
-  const chainId = await deployer.getChainId();
+  if (!SPONSOR_KEY) throw new Error("SPONSOR_KEY missing in .env");
+
+  const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider);
+
   const { address } = await deployments.get("GaslessNFT");
   const nft = (await ethers.getContractAt("GaslessNFT", address)) as GaslessNFT;
 
@@ -28,15 +21,16 @@ const main = async () => {
   const request: CallWithERC2771Request = {
     target: nft.address,
     data: data,
-    chainId: chainId,
-    user: deployer.address,
+    chainId: await wallet.getChainId(),
+    user: wallet.address,
   };
 
   const relay = new GelatoRelay();
+
   const { taskId } = await relay.sponsoredCallERC2771(
     request,
     wallet,
-    sponsorKey
+    SPONSOR_KEY
   );
 
   console.log("https://api.gelato.digital/tasks/status/" + taskId);

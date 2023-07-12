@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
+
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {
     ERC2771Context,
@@ -7,17 +8,17 @@ import {
 } from "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 
 contract GaslessNFT is ERC721, ERC2771Context {
-    uint256 public id;
+    uint256 public supply;
 
+    // solhint-disable no-empty-blocks
     constructor(
         string memory _name,
         string memory _symbol,
         address _gelatoRelay
-    ) ERC721(_name, _symbol) ERC2771Context(_gelatoRelay) {} // solhint-disable-line no-empty-blocks
+    ) ERC721(_name, _symbol) ERC2771Context(_gelatoRelay) {}
 
     function mint() external {
-        id++;
-        _safeMint(_msgSender(), id);
+        _safeMint(_msgSender(), supply++);
     }
 
     // Overrides needed due to multiple inheritance of Context:
