@@ -7,7 +7,6 @@ const main = async () => {
   const SPONSOR_KEY = process.env.SPONSOR_KEY;
 
   if (!PRIVATE_KEY) throw new Error("PRIVATE_KEY missing in .env");
-
   if (!SPONSOR_KEY) throw new Error("SPONSOR_KEY missing in .env");
 
   const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider);

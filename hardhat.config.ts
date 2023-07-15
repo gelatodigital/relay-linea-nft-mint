@@ -10,13 +10,12 @@ dotenv.config({ path: __dirname + "/.env" });
 
 const RPC_PROVIDER = process.env.RPC_PROVIDER;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY;
 
 import assert from "assert";
 assert.ok(RPC_PROVIDER, "Missing RPC_PROVIDER in .env");
 
 const config: HardhatUserConfig = {
-  defaultNetwork:"hardhat",
+  defaultNetwork: "hardhat",
   solidity: {
     compilers: [
       {
@@ -54,24 +53,6 @@ const config: HardhatUserConfig = {
       accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
     },
   },
-    etherscan: {
-      apiKey: { 
-        linea: ETHERSCAN_KEY as string
-        },
-      customChains: [
-        {
-          network: "linea",
-          chainId: 59140,
-          urls: {
-            apiURL: "https://goerli.lineascan.build/api",
-            browserURL: "https://goerli.lineascan.build/"
-          }
-        }
-      ]
-
-    
-  },
-  
 };
 
 export default config;
